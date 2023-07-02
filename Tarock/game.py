@@ -2,7 +2,9 @@
 from dataclasses import dataclass
 from enum import Enum, Flag
 import random
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Set
+
+# from coinflip_listener import CoinflipListenerMixin
 # from ALL_CARDS import ALL_CARDS, name_to_cardinfo
 
 
@@ -191,11 +193,21 @@ class Game:
     The game itself.
     '''
 
-    def __init__(self, starting_player: int, starting_hands: List[List[Card]]):
+    def __init__(self, starting_player: int, starting_hands: List[List[Card]], coinflip_listeners: Set = set()):
         self.game_state = GameState(Board.get_fresh_board(), starting_hands, starting_player)
+        self.coinflip_listeners = coinflip_listeners
 
     def get_game_state(self):
         return self.game_state
+    
+    def register_coinflip_listener(self, listener):
+        self.coinflip_listeners.add(listener)
+    
+    def get_coinflip_result(self, event: AttackEvent):
+        favored_player = random.randint(0, 1)
+        for listener in self.coinflip_listeners:
+            listener.on_coinflip_result(event, favored_player)
+        return favored_player
     
     def place_card(self, row: int, col: int, card: Card):
         '''
@@ -279,7 +291,8 @@ class Game:
 
         # if both overpower, coin flip to determine outcome
         if attack_overpower and defense_overpower:
-            attack_successful = random.choice([True, False])
+            favored_player = self.get_coinflip_result(event)
+            attack_successful = favored_player == event.intiating_player
 
         # if only the attack overpowers, the attack is successful
         elif attack_overpower:
@@ -297,7 +310,8 @@ class Game:
             elif attack_advantage < 0:
                 attack_successful = False
             else:
-                attack_successful = random.choice([True, False])
+                favored_player = self.get_coinflip_result(event)
+                attack_successful = favored_player == event.intiating_player
 
         return attack_successful
 

@@ -1,9 +1,10 @@
-from game import Game, Card, Board, Direction
+from game import Game, Card, Board, Direction, AttackEvent
 from pprint import pprint
 from ALL_CARDS import ALL_CARDS
+from coinflip_listener import CoinflipListenerMixin
 
 # This is a simple interactive game that allows you to play a game of Tarock with a friend.
-class InteractiveTarockOperator:
+class InteractiveTarockOperator(CoinflipListenerMixin):
 
     # setup the game
     def __init__(self):
@@ -12,6 +13,7 @@ class InteractiveTarockOperator:
         starting_hands = [player0_hand, player1_hand]
         starting_player = 0
         self.game = Game(starting_player, starting_hands)
+        self.game.register_coinflip_listener(self)
 
     def start_game(self):
         # print the game info
@@ -63,6 +65,14 @@ class InteractiveTarockOperator:
             print("Player 1 wins!")
         elif final_scores[0] < final_scores[1]:
             print("Player 2 wins!")
+
+    def on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
+        attacker = attack_event.attacker
+        defender = attack_event.defender
+        attacker_coords = attack_event.attacker_coords
+        defender_coords = attack_event.defender_coords
+        print(f"\nCoin flip required for {attacker.name} ({attacker_coords[0]}, {attacker_coords[1]}) attacking {defender.name} ({defender_coords[0]}, {defender_coords[1]})")
+        print(f"Player {favored_player+1} wins the coinflip!")
 
     @staticmethod
     def _print_board(board: Board):
