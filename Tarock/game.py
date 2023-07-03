@@ -217,7 +217,7 @@ class Game:
     def get_coinflip_result(self, event: AttackEvent):
         favored_player = random.randint(0, 1)
         for listener in self.coinflip_listeners:
-            listener.on_coinflip_result(event, favored_player)
+            listener._on_coinflip_result(event, favored_player)
         return favored_player
     
     def place_card(self, row: int, col: int, card: Card):

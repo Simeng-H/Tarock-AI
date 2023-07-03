@@ -77,7 +77,7 @@ class SemiInteractiveTarockController(CoinflipListenerMixin):
         elif final_scores[0] < final_scores[1]:
             print("AI wins!")
 
-    def on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
+    def _on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
         attacker = attack_event.attacker
         defender = attack_event.defender
         attacker_coords = attack_event.attacker_coords

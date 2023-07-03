@@ -11,7 +11,7 @@ class FullAiTarockController(CoinflipListenerMixin):
     def __init__(self, ai_0: TarockBaseAi, ai_1: TarockBaseAi, starting_player: int = 0):
         player0_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
         player1_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
-        starting_hands = [player0_hand, player1_hand]
+        starting_hands = (player0_hand, player1_hand)
         self.game = Game(starting_player, starting_hands)
         self.game.register_coinflip_listener(self)
         self.ais = [ai_0, ai_1]
@@ -60,7 +60,7 @@ class FullAiTarockController(CoinflipListenerMixin):
 
         return final_scores, self.game.game_state
 
-    def on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
+    def _on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
         attacker = attack_event.attacker
         defender = attack_event.defender
         attacker_coords = attack_event.attacker_coords
