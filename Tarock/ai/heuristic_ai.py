@@ -2,8 +2,8 @@ from game import *
 from ai.base_ai import TarockBaseAi
 import copy
 
-class SimpleHeuristicAI(TarockBaseAi):
-    # TODO: pass various parameters into the constructor to control the behavior of the AI
+
+class BaseHeuristicAI(TarockBaseAi):
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
 
         # calculate all the possible moves, each move is a tuple of ((row, col), card)
@@ -19,8 +19,10 @@ class SimpleHeuristicAI(TarockBaseAi):
         scores = [0.0] * len(possible_moves)
         for i in range(len(possible_moves)):
             for j in range(simulation_times):
-                temp_state = SimpleHeuristicAI.simulate_move(possible_moves[i][0], possible_moves[i][1], game_state)
-                scores[i] += SimpleHeuristicAI.evaluate_state(temp_state)[game_state.get_next_player()]
+                temp_state = self.simulate_move(
+                    possible_moves[i][0], possible_moves[i][1], game_state)
+                scores[i] += self.evaluate_state(
+                    temp_state)[game_state.get_next_player()]
             scores[i] /= simulation_times
 
         # get the move with the highest score
@@ -30,8 +32,17 @@ class SimpleHeuristicAI(TarockBaseAi):
         # return the move
         return possible_moves[max_score_index]
 
-    @staticmethod
-    def evaluate_state(game_state: GameState) -> Tuple[float, float]:
+    def evaluate_state(self, game_state: GameState) -> Tuple[float, float]:
+        raise NotImplementedError
+
+
+class SimpleHeuristicAI(BaseHeuristicAI):
+
+    def __init__(self, defense_coefficient: float = 1, attack_coefficient: float = 1, presence_coefficient: float = 5):
+        self.coefficients = (defense_coefficient,
+                             attack_coefficient, presence_coefficient)
+
+    def evaluate_state(self, game_state: GameState) -> Tuple[float, float]:
         '''
         Evaluates the given game state. Returns a tuple representing the score for each player.
         '''
@@ -40,10 +51,8 @@ class SimpleHeuristicAI(TarockBaseAi):
         scores = [0.0, 0.0]
 
         # score is based on linear sum of 1. total defense owned by player on the board 2. total attack of player's hand 3. total number of cards owned by player on the board
-        # coefficients for each of the above
-        defense_coefficient = 1
-        attack_coefficient = 1
-        presence_coefficient = 1.5
+        # coefficients for each of the above is defined in the constructor
+        defense_coefficient, attack_coefficient, presence_coefficient = self.coefficients
 
         # first look at the board to assign board-based scores
         board = game_state.board
@@ -53,6 +62,7 @@ class SimpleHeuristicAI(TarockBaseAi):
                 if cell.card is None:
                     continue
                 else:
+                    # cell is occupied and owned by someone
                     owner = cell.owner
                     presence_score = presence_coefficient
                     defense_score = cell.card.defense * defense_coefficient
@@ -67,6 +77,3 @@ class SimpleHeuristicAI(TarockBaseAi):
                 scores[player] += attack_score
 
         return tuple(scores)
-
-
-        
