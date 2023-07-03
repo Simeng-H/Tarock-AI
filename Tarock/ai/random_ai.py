@@ -1,5 +1,6 @@
 from game import *
 from human_vs_ai import *
+from ai.base_ai import TarockAI
 
 class RandomAI(TarockAI):
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:

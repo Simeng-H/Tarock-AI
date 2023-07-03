@@ -3,7 +3,7 @@ from pprint import pprint
 from ALL_CARDS import ALL_CARDS
 from coinflip_listener import CoinflipListenerMixin
 from typing import Tuple
-from human_vs_ai import TarockAI
+from ai.base_ai import TarockAI
 
 class FullAiTarockController(CoinflipListenerMixin):
 
@@ -121,5 +121,6 @@ class FullAiTarockController(CoinflipListenerMixin):
 
 if __name__ == "__main__":
     from ai.random_ai import RandomAI
-    controller = FullAiTarockController(RandomAI(), RandomAI())
+    from ai.heuristic_ai import SimpleHeuristicAI
+    controller = FullAiTarockController(RandomAI(), SimpleHeuristicAI())
     controller.start_game()
