@@ -148,7 +148,7 @@ class GameState:
     '''
     The state of the game. Contains the board and the hands of the players.
     '''
-    def __init__(self, board: Board , player_hands: List[List[Card]], next_player: int, terminal: bool = False):
+    def __init__(self, board: Board , player_hands: Tuple[List[Card],List[Card]], next_player: int, terminal: bool = False):
         self.board = board
         self.player_hands = player_hands
         self.next_player = next_player
@@ -204,7 +204,7 @@ class Game:
     The game itself.
     '''
 
-    def __init__(self, starting_player: int, starting_hands: List[List[Card]], coinflip_listeners: Set = set()):
+    def __init__(self, starting_player: int, starting_hands: Tuple[List[Card],List[Card]], coinflip_listeners: Set = set()):
         self.game_state = GameState(Board.get_fresh_board(), starting_hands, starting_player)
         self.coinflip_listeners = coinflip_listeners
 
