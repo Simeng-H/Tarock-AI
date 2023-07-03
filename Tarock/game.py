@@ -62,6 +62,9 @@ class Card:
     def __repr__(self):
         return str(self)
     
+    def __eq__(self, other):
+        return (self.attack == other.attack and self.defense == other.defense and self.directions == other.directions) or self.name == other.name
+    
     @staticmethod
     def get_card_based_on_cardinfo(cardinfo):
         return Card(cardinfo.attack, cardinfo.defense, cardinfo.name, cardinfo.directions)
@@ -74,7 +77,7 @@ class Cell:
     '''
     A cell in the game board. Can be either empty or occupied by a card.
     '''
-    def __init__(self, card: Optional[Card] = None, owner: int = 1):
+    def __init__(self, card: Optional[Card] = None, owner: int = -1):
         self.card = card
         self.owner = owner
 
@@ -96,6 +99,14 @@ class Board:
 
     def get_cell_owner(self, row, col):
         return self.cells[row][col].owner if self.cells[row][col].card is not None else None
+    
+    def get_empty_coords(self):
+        empty_coords = []
+        for row in range(3):
+            for col in range(3):
+                if self.is_cell_empty(row, col):
+                    empty_coords.append((row, col))
+        return empty_coords
 
 
     
@@ -233,10 +244,6 @@ class Game:
 
         # check if the game is over
         self.game_state.ended = self.game_state.is_terminal()
-
-
-
-
 
     def _generate_attack_events(self, attacker_coord: Tuple[int, int] , attacking_card: Card, attacking_player: int):
         '''
