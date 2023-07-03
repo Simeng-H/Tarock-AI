@@ -3,14 +3,7 @@ from pprint import pprint
 from ALL_CARDS import ALL_CARDS
 from coinflip_listener import CoinflipListenerMixin
 from typing import Tuple
-
-class TarockAI:
-    def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
-        '''
-        Provided the current game state, return a move to make, in the form of a tuple of the form:
-        ((row, col), card)
-        '''
-        raise NotImplementedError("get_move not implemented")
+from ai.base_ai import TarockAI
 
 class SemiInteractiveTarockController(CoinflipListenerMixin):
 
