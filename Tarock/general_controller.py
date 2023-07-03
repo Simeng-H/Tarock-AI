@@ -5,6 +5,7 @@ from coinflip_listener import CoinflipListenerMixin
 from typing import Tuple, List, Optional
 from tarock_player import TarockBasePlayer
 from ai.base_ai import TarockBaseAi
+from human_player import HumanTarockPlayer
 
 class TarockGameController(CoinflipListenerMixin):
 

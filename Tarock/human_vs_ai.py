@@ -11,7 +11,7 @@ class SemiInteractiveTarockController(CoinflipListenerMixin):
     def __init__(self, ai: TarockBaseAi, player_start: bool = True):
         player0_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
         player1_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
-        starting_hands = [player0_hand, player1_hand]
+        starting_hands = (player0_hand, player1_hand)
         starting_player = 0 if player_start else 1
         self.game = Game(starting_player, starting_hands)
         self.game.register_coinflip_listener(self)
