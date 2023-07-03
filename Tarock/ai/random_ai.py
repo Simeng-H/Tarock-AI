@@ -1,8 +1,8 @@
 from game import *
 from human_vs_ai import *
-from ai.base_ai import TarockAI
+from ai.base_ai import TarockBaseAi
 
-class RandomAI(TarockAI):
+class RandomAI(TarockBaseAi):
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
         # get a random card from the hand
         card = random.choice(game_state.player_hands[game_state.get_next_player()])

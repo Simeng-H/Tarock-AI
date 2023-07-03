@@ -3,12 +3,12 @@ from pprint import pprint
 from ALL_CARDS import ALL_CARDS
 from coinflip_listener import CoinflipListenerMixin
 from typing import Tuple
-from ai.base_ai import TarockAI
+from ai.base_ai import TarockBaseAi
 
 class SemiInteractiveTarockController(CoinflipListenerMixin):
 
     # setup the game, player 0 is human, player 1 is AI
-    def __init__(self, ai: TarockAI, player_start: bool = True):
+    def __init__(self, ai: TarockBaseAi, player_start: bool = True):
         player0_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
         player1_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
         starting_hands = [player0_hand, player1_hand]

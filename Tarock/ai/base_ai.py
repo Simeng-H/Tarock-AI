@@ -1,14 +1,8 @@
 from game import *
+from tarock_player import TarockBasePlayer
 import copy
 
-class TarockAI:
-    def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
-        '''
-        Provided the current game state, return a move to make, in the form of a tuple of the form:
-        ((row, col), card)
-        '''
-        raise NotImplementedError("get_move not implemented")
-
+class TarockBaseAi(TarockBasePlayer):
     @staticmethod
     def simulate_move(coords: Tuple[int, int], card: Card, current_state: GameState) -> GameState:
         '''
@@ -29,9 +23,9 @@ class TarockAI:
         temp_state.player_hands[temp_state.get_next_player()].remove(copied_card)
 
         # generate the events that this card causes
-        attack_events = TarockAI._generate_attack_events_for_placement(coords, copied_card, temp_state.get_next_player(), temp_state.board)
+        attack_events = TarockBaseAi._generate_attack_events_for_placement(coords, copied_card, temp_state.get_next_player(), temp_state.board)
         for attack_event in attack_events:
-            TarockAI._resolve_attack_event(attack_event, temp_state.board)
+            TarockBaseAi._resolve_attack_event(attack_event, temp_state.board)
 
         # change the next player
         temp_state.next_player = 1 - temp_state.next_player
@@ -72,7 +66,7 @@ class TarockAI:
         '''
         Resolves an event. Nothing happens if the attack is unsuccessful. If the attack is successful, the defender's ownership is transfered to the attacker.
         '''
-        attack_successful = TarockAI._determine_attack_event_outcome(event)
+        attack_successful = TarockBaseAi._determine_attack_event_outcome(event)
         if attack_successful:
             defender_cell = board.get_cell_value(event.defender_coords)
             defender_cell.owner = event.intiating_player

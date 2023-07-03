@@ -1,8 +1,8 @@
 from game import *
-from ai.base_ai import TarockAI
+from ai.base_ai import TarockBaseAi
 import copy
 
-class SimpleHeuristicAI(TarockAI):
+class SimpleHeuristicAI(TarockBaseAi):
     # TODO: pass various parameters into the constructor to control the behavior of the AI
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
 
