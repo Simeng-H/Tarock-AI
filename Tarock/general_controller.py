@@ -15,6 +15,14 @@ class TarockGameController(CoinflipListenerMixin):
             self,
             player1: TarockBasePlayer,
             player2: TarockBasePlayer,
+    ):
+        # initialize the players
+        self.players = [player1, player2]
+
+
+
+    def start_new_game(
+            self,
             starting_player: int = 0,
             starting_hands: Optional[Tuple[List[Card], List[Card]]] = None,
             fair_start: bool = False
@@ -30,16 +38,17 @@ class TarockGameController(CoinflipListenerMixin):
                     player1_hand = [Card.get_random_card(
                         ALL_CARDS) for _ in range(5)]
                     starting_hands = (player0_hand, player1_hand)
-
-        # initialize the game and register to listen for coinflips
         self.game = Game(starting_player, starting_hands)
         self.game.register_coinflip_listener(self)
 
-        # initialize the players
-        self.players = [player1, player2]
-
         # print the game info
         self._print_pre_game_info()
+
+        # play the game
+        final_scores = self._start_game()
+
+        return final_scores
+
 
     def _print_pre_game_info(self):
         print("Welcome to Tarock! Starting a new game...")
@@ -50,7 +59,7 @@ class TarockGameController(CoinflipListenerMixin):
         print(f"Starting player: {self.game.game_state.get_next_player()+1}")
 
 
-    def start_game(self):
+    def _start_game(self):
         # play the game
         while not self.game.game_state.ended:
             # print the game state
@@ -79,6 +88,7 @@ class TarockGameController(CoinflipListenerMixin):
         print(f"Player 2: {final_scores[1]}")
         winner = 0 if final_scores[0] > final_scores[1] else 1
         print(f"Player {winner+1} wins!")
+        return final_scores
 
     def _on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
         attacker = attack_event.attacker
@@ -175,5 +185,14 @@ if __name__ == "__main__":
     from ai.random_ai import RandomAI
     from ai.heuristic_ai import SimpleHeuristicAI
     # controller = TarockGameController(HumanTarockPlayer(), HumanTarockPlayer())
-    controller = TarockGameController(RandomAI(), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10), fair_start=True)
-    controller.start_game()
+    # controller = TarockGameController(RandomAI(), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
+    controller = TarockGameController(SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
+
+    win_counts = [0, 0]
+    for _ in range(100):
+        final_scores = controller.start_new_game(fair_start=True, starting_player=1)
+        winner = 0 if final_scores[0] > final_scores[1] else 1
+        win_counts[winner] += 1
+
+    print(f"Player 1 won {win_counts[0]} times")
+    print(f"Player 2 won {win_counts[1]} times")
