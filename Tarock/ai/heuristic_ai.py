@@ -21,8 +21,10 @@ class BaseHeuristicAI(TarockBaseAi):
             for j in range(simulation_times):
                 temp_state = self.simulate_move(
                     possible_moves[i][0], possible_moves[i][1], game_state)
-                scores[i] += self.evaluate_state(
-                    temp_state)[game_state.get_next_player()]
+                this_score = self.evaluate_state(temp_state)
+                my_score = this_score[game_state.get_next_player()]
+                opponent_score = this_score[1 - game_state.get_next_player()]
+                scores[i] += my_score - opponent_score
             scores[i] /= simulation_times
 
         # get the move with the highest score
