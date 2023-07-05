@@ -42,7 +42,7 @@ class TarockBaseAi(TarockBasePlayer):
 
             # get the defense cell in the given direction
             try:
-                defense_cell_coords = Board.get_cell_in_direction(coords, direction)
+                defense_cell_coords = Board.get_adj_coord_in_direction(coords, direction)
                 defense_cell = board.get_cell_value(defense_cell_coords)
             except ValueError:
                 continue

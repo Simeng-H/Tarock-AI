@@ -97,7 +97,8 @@ class Board:
     def get_cell_value(self, coord: Tuple[int, int]):
         return self.cells[coord[0]][coord[1]]
 
-    def get_cell_owner(self, row, col):
+    def get_cell_owner(self, coords: Tuple[int, int]):
+        row, col = coords
         return self.cells[row][col].owner if self.cells[row][col].card is not None else None
     
     def get_empty_coords(self):
@@ -162,7 +163,7 @@ class Board:
 
     
     @staticmethod
-    def get_cell_in_direction(coord: Tuple[int, int], direction: Direction):
+    def get_adj_coord_in_direction(coord: Tuple[int, int], direction: Direction):
         if direction == Direction.UP:
             temp_coord = (coord[0] - 1, coord[1])
         elif direction == Direction.DOWN:
@@ -233,7 +234,7 @@ class GameState:
         scores = [0, 0]
         for row in range(3):
             for col in range(3):
-                owner = self.board.get_cell_owner(row, col)
+                owner = self.board.get_cell_owner((row, col))
                 if owner is not None:
                     scores[owner] += 1
         return scores
@@ -305,7 +306,7 @@ class Game:
 
             # get the defense cell in the given direction
             try:
-                defense_cell_coords = Board.get_cell_in_direction(attacker_coord, direction)
+                defense_cell_coords = Board.get_adj_coord_in_direction(attacker_coord, direction)
                 defense_cell = self.game_state.board.get_cell_value(defense_cell_coords)
             except ValueError:
                 continue
