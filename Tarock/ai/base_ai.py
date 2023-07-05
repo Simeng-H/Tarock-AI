@@ -8,7 +8,7 @@ class TarockBaseAi(TarockBasePlayer):
         '''
         Simulates placing a card on the board. The card is placed on the given cell and the cell is marked as owned by the given player. Returns a new game state with the new board.
         '''
-        temp_state = copy.deepcopy(current_state)
+        temp_state = copy.copy(current_state)
 
         # HACK: find the card in the player's hand,
         copied_card = card

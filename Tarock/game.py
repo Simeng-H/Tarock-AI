@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, Flag
 import random
 from typing import List, Optional, Tuple, Set
+from copy import copy
 
 # from coinflip_listener import CoinflipListenerMixin
 # from ALL_CARDS import ALL_CARDS, name_to_cardinfo
@@ -50,6 +51,7 @@ class Card:
             When attacking: the card ignores the defense of the cards in these directions. If the card being attacked doesn't have a defense in the opposite direction, the attack is automatically successful. Otherwise, the outcome depends on a coin toss.
             When defending: the card ignores the attack of the cards in these directions. If the card being attacked doesn't have an attack in the opposite direction, the attack is automatically failed. Otherwise, the outcome depends on a coin toss.
     '''
+    # TODO: make immutable
     def __init__(self, attack: int, defense: int, name: str, directions: List[Direction]):
         self.attack = attack
         self.defense = defense
@@ -81,6 +83,9 @@ class Cell:
         self.card = card
         self.owner = owner
 
+    def __copy__(self):
+        return Cell(self.card, self.owner)
+
     def __str__(self):
         return str(self.card) + f"*{self.owner+1}" if self.card is not None else "Empty"
 
@@ -88,8 +93,15 @@ class Board:
     '''
     The board of the game. Contains 9 cells in a 3x3 grid, each of which can hold a card. Each cell can be either empty or occupied by a card. A cell which is occupied by a card must have a owner, which is one of the players.
     '''
-    def __init__(self):
-        self.cells = [[Cell() for _ in range(3)] for _ in range(3)]
+    def __init__(self, cells: Optional[List[List[Cell]]] = None):
+        if cells is not None:
+            self.cells = cells
+        else:
+            self.cells = [[Cell() for _ in range(3)] for _ in range(3)]
+
+    def __copy__(self):
+        copied_cells = [[copy(cell) for cell in row] for row in self.cells]
+        return Board(copied_cells)
 
     def is_cell_empty(self, row, col):
         return self.cells[row][col].card is None
@@ -205,6 +217,14 @@ class GameState:
         self.player_hands = player_hands
         self.next_player = next_player
         self.ended = terminal
+
+    def __copy__(self):
+        copied_board = copy(self.board)
+        copied_player_hands = (
+            [card for card in self.player_hands[0]],
+            [card for card in self.player_hands[1]]
+        )
+        return GameState(copied_board, copied_player_hands, self.next_player)
 
     def get_player_hand(self, player: int):
         return self.player_hands[player]

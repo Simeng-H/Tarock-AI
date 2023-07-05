@@ -136,10 +136,11 @@ if __name__ == "__main__":
     from ai.heuristic_ai import SimpleHeuristicAI
 
     # player_1 = HumanTarockPlayer()
-    # player_2 = RandomAI()
+    # player_1 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1)
+    player_1 = RandomAI()
 
-    player_1 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1)
-    player_2 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10)
+    # player_2 = RandomAI()
+    player_2 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=5)
 
     controller = TarockGameController(player_1, player_2)
     # controller.register_event_listener(player_1, 0)
@@ -150,7 +151,7 @@ if __name__ == "__main__":
 
     win_counts = [0, 0]
     for _ in trange(1000):
-        final_scores = controller.start_new_game(fair_start=True, starting_player=1)
+        final_scores = controller.start_new_game(fair_start=True, starting_player=0)
         winner = 0 if final_scores[0] > final_scores[1] else 1
         win_counts[winner] += 1
 
