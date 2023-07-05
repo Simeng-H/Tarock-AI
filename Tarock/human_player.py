@@ -1,14 +1,33 @@
+from game_event_listener import GameStartEvent
 from game import *
 from tarock_player import TarockBasePlayer
+from game_event_listener import PrintGameEventsMixin
+from pprint import pprint
 
-class HumanTarockPlayer(TarockBasePlayer):
+class HumanTarockPlayer(TarockBasePlayer, PrintGameEventsMixin):
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
         '''
         Provided the current game state, return a move to make, in the form of a tuple of the form:
         ((row, col), card)
         '''
+
+        # starting prompt
+        print("\nYour turn to move!")
+
+        # print the board
+        print("\nCurrent Board:")
+        print(game_state.board)
+
+        # print the opponent's hand
+        print("\nOpponent's hand:")
+        pprint(game_state.player_hands[1- game_state.get_next_player()])
+
+        # print the player's hand
+        print("\nYour hand:")
+        pprint(game_state.player_hands[game_state.get_next_player()])
+
         # prompt the player to select a card for placement
-        print("Select a card to place on the board: [1-5]")
+        print("\nSelect a card to place on the board: [1-5]")
         for i, card in enumerate(game_state.player_hands[game_state.get_next_player()]):
             print(f"{i+1}: {card}")
         card_index = int(input()) - 1
