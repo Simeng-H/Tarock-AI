@@ -49,6 +49,14 @@ class SimpleHeuristicAI(BaseHeuristicAI):
         Evaluates the given game state. Returns a tuple representing the score for each player.
         '''
 
+        # First, check if the game is over, if so, assign 100 points to the winner
+        if game_state.is_terminal():
+            final_game_scores = game_state.get_scores()
+            winner = final_game_scores.index(max(final_game_scores))
+            scores = [0.0, 0.0]
+            scores[winner] = 100.0
+            return tuple(scores)
+
         # initialize scores
         scores = [0.0, 0.0]
 
