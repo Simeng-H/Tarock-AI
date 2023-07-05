@@ -7,6 +7,7 @@ from typing import Tuple, List, Optional
 from tarock_player import TarockBasePlayer
 from ai.base_ai import TarockBaseAi
 from human_player import HumanTarockPlayer
+from tqdm import trange
 
 
 class TarockGameController(CoinflipListenerMixin):
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     # controller = TarockGameController(SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
 
     win_counts = [0, 0]
-    for _ in range(100):
+    for _ in trange(1000):
         final_scores = controller.start_new_game(fair_start=True, starting_player=1)
         winner = 0 if final_scores[0] > final_scores[1] else 1
         win_counts[winner] += 1
