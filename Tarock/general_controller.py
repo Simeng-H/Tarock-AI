@@ -1,3 +1,4 @@
+from game_event_listener import *
 from game import Game, Card, Board, Direction, AttackEvent, GameState
 from pprint import pprint
 from ALL_CARDS import ALL_CARDS
@@ -18,8 +19,26 @@ class TarockGameController(CoinflipListenerMixin):
     ):
         # initialize the players
         self.players = [player1, player2]
+        self.game_event_listeners: List[BaseGameEventListener] = []
+        self.player_game_event_listeners: List[Optional[BaseGameEventListener]] = [None, None]
 
+    def register_event_listener(self, listener: BaseGameEventListener, player_index: int = -1):
+        self.game_event_listeners.append(listener)
 
+        # TODO: safety check, maybe?
+        if player_index >= 0:
+            self.player_game_event_listeners[player_index] = listener
+
+    def dispatch_event(self, event: GameEvent, players_only = False, players_to_notify: List[int] = []):
+        if players_only:
+            for player_index in players_to_notify:
+                listener = self.player_game_event_listeners[player_index]
+                if listener is not None:
+                    listener._on_game_event(event)
+        else:
+            for listener in self.game_event_listeners:
+                listener._on_game_event(event)
+        
 
     def start_new_game(
             self,
@@ -38,66 +57,48 @@ class TarockGameController(CoinflipListenerMixin):
                     player1_hand = [Card.get_random_card(
                         ALL_CARDS) for _ in range(5)]
                     starting_hands = (player0_hand, player1_hand)
+
+        # initialize the game
         self.game = Game(starting_player, starting_hands)
         self.game.register_coinflip_listener(self)
-
-        # print the game info
-        self._print_pre_game_info()
+        self.dispatch_event(GameStartEvent(self.game.game_state))
 
         # play the game
         final_scores = self._start_game()
 
         return final_scores
 
-
-    def _print_pre_game_info(self):
-        print("Welcome to Tarock! Starting a new game...")
-        print("Player 1's hand: ")
-        pprint(self.game.game_state.player_hands[0])
-        print("Player 2's hand: ")
-        pprint(self.game.game_state.player_hands[1])
-        print(f"Starting player: {self.game.game_state.get_next_player()+1}")
-
-
     def _start_game(self):
         # play the game
         while not self.game.game_state.ended:
-            # print the game state
-            print("\n\nCurrent Board:")
-            self._print_board(self.game.game_state.board)
-            print("player 1's hand: ")
-            pprint(self.game.game_state.player_hands[0])
-            print("\nplayer 2's hand: ")
-            pprint(self.game.game_state.player_hands[1])
-
-            # print the next player
+            # determine the next player
             next_to_play = self.game.game_state.get_next_player()
-            print(f"\n\nPlayer {next_to_play+1}'s turn!")
+
+            # get the next move from the player
             coord, card = self.players[next_to_play].get_move(
                 self.game.game_state)
-            print(
-                f"Player {next_to_play+1} places {card} at ({coord[0]}, {coord[1]})")
+            
+
+            # notify the listeners that player has made a move
+            self.dispatch_event(PlayerMoveEvent(
+                coord,
+                card,
+                initiating_player=next_to_play,
+            ))
+
+            # actually place the card on the board
             self.game.place_card(coord[0], coord[1], card)
 
-        # game ended, print the final board and declare the winner
-        print("\n\nFinal Board:")
-        self._print_board(self.game.game_state.board)
+        # game ended, notify the listeners
+        self.dispatch_event(GameEndEvent(self.game.game_state))
+
+        # get and return the final scores
         final_scores = self.game.game_state.get_scores()
-        print("Final scores:")
-        print(f"Player 1: {final_scores[0]}")
-        print(f"Player 2: {final_scores[1]}")
-        winner = 0 if final_scores[0] > final_scores[1] else 1
-        print(f"Player {winner+1} wins!")
         return final_scores
 
     def _on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
-        attacker = attack_event.attacker
-        defender = attack_event.defender
-        attacker_coords = attack_event.attacker_coords
-        defender_coords = attack_event.defender_coords
-        print(
-            f"\nCoin flip required for {attacker.name} ({attacker_coords[0]}, {attacker_coords[1]}) attacking {defender.name} ({defender_coords[0]}, {defender_coords[1]})")
-        print(f"Player {favored_player+1} wins the coin flip")
+        # notify the listeners that the coinflip has been resolved
+        self.dispatch_event(CoinflipEvent(attack_event, favored_player))
 
     @staticmethod
     def _hand_is_fair(starting_hands: Tuple[List[Card], List[Card]]) -> bool:
@@ -132,9 +133,19 @@ class TarockGameController(CoinflipListenerMixin):
 if __name__ == "__main__":
     from ai.random_ai import RandomAI
     from ai.heuristic_ai import SimpleHeuristicAI
+
+    # player_1 = HumanTarockPlayer()
+    # player_2 = RandomAI()
+
+    player_1 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1)
+    player_2 = SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10)
+
+    controller = TarockGameController(player_1, player_2)
+    # controller.register_event_listener(player_1, 0)
+
     # controller = TarockGameController(HumanTarockPlayer(), HumanTarockPlayer())
     # controller = TarockGameController(RandomAI(), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
-    controller = TarockGameController(SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
+    # controller = TarockGameController(SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=1), SimpleHeuristicAI(attack_coefficient=1, defense_coefficient=1, presence_coefficient=10))
 
     win_counts = [0, 0]
     for _ in range(100):
