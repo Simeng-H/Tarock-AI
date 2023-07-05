@@ -107,6 +107,57 @@ class Board:
                 if self.is_cell_empty(row, col):
                     empty_coords.append((row, col))
         return empty_coords
+    
+    def __str__(self) -> str:
+        # generate a pretty representation of the board with 3 rows and 3 columns, each cell in 20 characters wide
+
+        # first, generate the top border
+        board_str = "┌"+"─"*20+"┬"+"─"*20+"┬"+"─"*20+"┐\n"
+
+        # then, generate the rows
+        for row in range(3):
+            for i in range(5):
+                board_str += "│"
+                for col in range(3):
+                    cell = self.cells[row][col]
+                    if cell.card is None:
+                        if i == 2:
+                            board_str += f"({row},{col})".center(20)
+                        else:
+                            board_str += " "*20
+                    else:
+                        name_lines = cell.card.name.center(20).split('\n')
+                        attack_defense = f"(🗡️ {cell.card.attack}/🛡️ {cell.card.defense})".center(
+                            22)
+                        attack_defense_lines = attack_defense.split('\n')
+                        if i == 1:
+                            board_str += name_lines[0].center(20)
+                        elif i == 2:
+                            board_str += attack_defense_lines[0].center(20)
+                        elif i == 3:
+                            direction_str = ""
+                            if Direction.UP in cell.card.directions:
+                                direction_str += "↑"
+                            if Direction.RIGHT in cell.card.directions:
+                                direction_str += "→"
+                            if Direction.DOWN in cell.card.directions:
+                                direction_str += "↓"
+                            if Direction.LEFT in cell.card.directions:
+                                direction_str += "←"
+                            board_str += direction_str.center(20)
+                        elif i == 4:
+                            board_str += f"Player {cell.owner + 1}".center(20)
+                        else:
+                            board_str += " "*20
+                    board_str += "│"
+                board_str += "\n"
+            if row != 2:
+                board_str += "├"+"─"*20+"┼"+"─"*20+"┼"+"─"*20+"┤\n"
+
+        # finally, generate the bottom border
+        board_str += "└"+"─"*20+"┴"+"─"*20+"┴"+"─"*20+"┘\n"
+
+        return board_str
 
 
     
