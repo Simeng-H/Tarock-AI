@@ -1,5 +1,4 @@
 from game import *
-from human_vs_ai import *
 from ai.base_ai import TarockBaseAi
 
 class RandomAI(TarockBaseAi):

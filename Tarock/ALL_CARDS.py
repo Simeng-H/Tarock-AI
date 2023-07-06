@@ -132,7 +132,7 @@ ALL_CARDS = [
     CardInfo(name="Itica", attack=2, defense=4),
     CardInfo(name="Scarabara", attack=5, defense=2),
     CardInfo(name="Irontalon", attack=4, defense=6),
-    CardInfo(name="Dark Troopers", attack=5, defense=4),
+    CardInfo(name="Dark Troopers", attack=5, defense=4, directions=[Direction.RIGHT]),
     CardInfo(name="Spiderbot", attack=3, defense=7),
     CardInfo(name="Kaktos", attack=5, defense=4, directions=[Direction.UP]),
     CardInfo(name="Gillman Warriors", attack=4, defense=7),
@@ -141,6 +141,7 @@ ALL_CARDS = [
     CardInfo(name="Owru Bandits", attack=6, defense=5),
     CardInfo(name="Security Drone", attack=7, defense=4),
     CardInfo(name="Ghost", attack=6, defense=7),
+    CardInfo(name="Mysterious Dagger", attack=5, defense=5),
 ]
 
 name_to_cardinfo = {card.name: card for card in ALL_CARDS}
