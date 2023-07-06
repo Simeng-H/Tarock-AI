@@ -51,7 +51,7 @@ class CardInfo:
 
 # Arcadian Soldiers
 
-# Owru Bandit
+# Owru Bandits
 
 # Security Drone
 
@@ -138,7 +138,7 @@ ALL_CARDS = [
     CardInfo(name="Gillman Warriors", attack=4, defense=7),
     CardInfo(name="Galactoss", attack=6, defense=4, directions=[Direction.DOWN]),
     CardInfo(name="Arcadian Soldiers", attack=5, defense=6),
-    CardInfo(name="Owru Bandit", attack=6, defense=5),
+    CardInfo(name="Owru Bandits", attack=6, defense=5),
     CardInfo(name="Security Drone", attack=7, defense=4),
     CardInfo(name="Ghost", attack=6, defense=7),
 ]
