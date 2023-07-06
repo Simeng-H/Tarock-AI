@@ -18,8 +18,8 @@ class GameEndEvent(GameEvent):
         super().__init__(event_data)
 
 class CoinflipEvent(GameEvent):
-    def __init__(self, attack_event: AttackEvent, favored_player: int):
-        event_data = (attack_event, favored_player)
+    def __init__(self, attack_event: AttackEvent, successful: int):
+        event_data = (attack_event, successful)
         super().__init__(event_data)
 
 class PlayerMoveEvent(GameEvent):
@@ -71,14 +71,17 @@ class PrintGameEventsMixin(BaseGameEventListener):
         final_board = final_state.board
         print(final_board)
 
-    def _print_on_coinflip_result(self, attack_event: AttackEvent, favored_player: int):
+    def _print_on_coinflip_result(self, attack_event: AttackEvent, successful: bool):
         attacker = attack_event.attacker
         defender = attack_event.defender
         attacker_coords = attack_event.attacker_coords
         defender_coords = attack_event.defender_coords
         print(
             f"\nCoin flip required for {attacker.name} ({attacker_coords[0]}, {attacker_coords[1]}) attacking {defender.name} ({defender_coords[0]}, {defender_coords[1]})")
-        print(f"Player {favored_player+1} wins the coin flip")
+        if successful:
+            print("\nAttack successful!")
+        else:
+            print("\nAttack failed!")
 
     def _print_on_player_move(self, coords: Tuple[int, int], card: Card, initiating_player: int):
         print(f"\nPlayer {initiating_player + 1} places {card} at ({coords[0]}, {coords[1]})")

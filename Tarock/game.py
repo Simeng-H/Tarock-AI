@@ -280,21 +280,29 @@ class Game:
     The game itself.
     '''
 
-    def __init__(self, starting_player: int, starting_hands: Tuple[List[Card],List[Card]], coinflip_listeners: Set = set()):
+    def __init__(self, starting_player: int, starting_hands: Tuple[List[Card],List[Card]], coinflip_listeners: Set = set(), coinfip_manipulator = None):
         self.game_state = GameState(Board.get_fresh_board(), starting_hands, starting_player)
         self.coinflip_listeners = coinflip_listeners
+        self.coinflip_manipulator = coinfip_manipulator
 
     def get_game_state(self):
         return self.game_state
     
     def register_coinflip_listener(self, listener):
         self.coinflip_listeners.add(listener)
+
+    def register_coinflip_manipulator(self, manipulator):
+        self.coinflip_manipulator = manipulator
     
     def get_coinflip_result(self, event: AttackEvent):
-        favored_player = random.randint(0, 1)
+        if self.coinflip_manipulator is not None:
+            successful = self.coinflip_manipulator.determine_coinflip_outcome(event)
+        else:
+            successful = random.randint(0, 1)
+
         for listener in self.coinflip_listeners:
-            listener._on_coinflip_result(event, favored_player)
-        return favored_player
+            listener._on_coinflip_result(event, successful)
+        return successful
     
     def place_card(self, row: int, col: int, card: Card):
         '''
@@ -374,8 +382,7 @@ class Game:
 
         # if both overpower, coin flip to determine outcome
         if attack_overpower and defense_overpower:
-            favored_player = self.get_coinflip_result(event)
-            attack_successful = favored_player == event.intiating_player
+            attack_successful = self.get_coinflip_result(event)
 
         # if only the attack overpowers, the attack is successful
         elif attack_overpower:
@@ -393,8 +400,7 @@ class Game:
             elif attack_advantage < 0:
                 attack_successful = False
             else:
-                favored_player = self.get_coinflip_result(event)
-                attack_successful = favored_player == event.intiating_player
+                attack_successful = self.get_coinflip_result(event)
 
         return attack_successful
 

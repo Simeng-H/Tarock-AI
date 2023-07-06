@@ -2,7 +2,7 @@ from game_event_listener import *
 from game import Game, Card, Board, Direction, AttackEvent, GameState
 from pprint import pprint
 from ALL_CARDS import ALL_CARDS
-from coinflip_listener import CoinflipListenerMixin
+from coinflip_hooks import CoinflipListener, ConflipManipulator
 from typing import Tuple, List, Optional
 from tarock_player import TarockBasePlayer
 from ai.base_ai import TarockBaseAi
@@ -10,7 +10,7 @@ from human_player import HumanTarockPlayer
 from tqdm import trange
 
 
-class TarockGameController(CoinflipListenerMixin):
+class TarockGameController(CoinflipListener):
 
     # setup the game, player 0 is human, player 1 is AI
     def __init__(
@@ -46,7 +46,8 @@ class TarockGameController(CoinflipListenerMixin):
             self,
             starting_player: int = 0,
             starting_hands: Optional[Tuple[List[Card], List[Card]]] = None,
-            fair_start: bool = False
+            fair_start: bool = False,
+            coinflip_manipulator: int = -1,
     ):
         if starting_hands is None:
             player0_hand = [Card.get_random_card(ALL_CARDS) for _ in range(5)]
@@ -63,6 +64,10 @@ class TarockGameController(CoinflipListenerMixin):
         # initialize the game
         self.game = Game(starting_player, starting_hands)
         self.game.register_coinflip_listener(self)
+        if coinflip_manipulator != -1:
+            self.game.register_coinflip_manipulator(self.players[coinflip_manipulator])
+
+        # notify the listeners that the game has started
         self.dispatch_event(GameStartEvent(self.game.game_state))
 
         # play the game

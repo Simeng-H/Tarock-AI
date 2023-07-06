@@ -1,10 +1,11 @@
+from coinflip_hooks import ConflipManipulator
 from game_event_listener import GameStartEvent
 from game import *
 from tarock_player import TarockBasePlayer
 from game_event_listener import PrintGameEventsMixin
 from pprint import pprint
 
-class HumanTarockPlayer(TarockBasePlayer, PrintGameEventsMixin):
+class HumanTarockPlayer(TarockBasePlayer, PrintGameEventsMixin, ConflipManipulator):
     def get_move(self, game_state: GameState) -> Tuple[Tuple[int, int], Card]:
         '''
         Provided the current game state, return a move to make, in the form of a tuple of the form:
@@ -41,3 +42,13 @@ class HumanTarockPlayer(TarockBasePlayer, PrintGameEventsMixin):
 
         # return the move
         return (row, col), card
+    
+    def determine_coinflip_outcome(self, attack_event: AttackEvent) -> bool:
+        attacker = attack_event.attacker
+        defender = attack_event.defender
+        attacker_coords = attack_event.attacker_coords
+        defender_coords = attack_event.defender_coords
+        print(
+            f"\n\tManipulator: Coin flip required for {attacker.name} ({attacker_coords[0]}, {attacker_coords[1]}) attacking {defender.name} ({defender_coords[0]}, {defender_coords[1]})")
+        choice = int(input("\tEnter 0 for failure, 1 for success: "))
+        return choice == 1
