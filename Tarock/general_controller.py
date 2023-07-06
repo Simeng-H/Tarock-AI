@@ -23,6 +23,7 @@ class TarockGameController(CoinflipListenerMixin):
         self.game_event_listeners: List[BaseGameEventListener] = []
         self.player_game_event_listeners: List[Optional[BaseGameEventListener]] = [None, None]
 
+    # TODO: make this automatic
     def register_event_listener(self, listener: BaseGameEventListener, player_index: int = -1):
         self.game_event_listeners.append(listener)
 
