@@ -27,13 +27,13 @@ class Direction(Enum):
         
     def __str__(self):
         if self == Direction.UP:
-            return "⬆️"
+            return "⬆️ "
         elif self == Direction.DOWN:
-            return "⬇️"
+            return "⬇️ "
         elif self == Direction.LEFT:
-            return "⬅️"
+            return "⬅️ "
         elif self == Direction.RIGHT:
-            return "➡️"
+            return "➡️ "
     
     @staticmethod 
     def all_directions():
@@ -59,7 +59,11 @@ class Card:
         self.directions = directions
 
     def __str__(self):
-        return f"{self.name} (🗡️ {self.attack} 🛡️ {self.defense})"
+        if len(self.directions) == 0:
+            return f"{self.name} (🗡️ {self.attack} 🛡️ {self.defense})"
+        else:
+            direction_str = "".join([str(direction) for direction in self.directions])
+            return f"{self.name} (🗡️ {self.attack} 🛡️ {self.defense}, {direction_str})"
 
     def __repr__(self):
         return str(self)
